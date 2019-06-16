@@ -11,8 +11,6 @@
                 <p>
                     <span>申请人姓名：</span>
                     <span>{{obj.nickname}}</span>
-                   
-
                 </p>
                 <p>
                     <span @click="personal(obj)" class="iconfont you">&#xe630;</span>
@@ -45,7 +43,12 @@
                     </li>
                     <li>
                         <span>{{tit}}类型</span>
-                        <span></span>
+                        <select  @change="select" :value="value">
+                                <option value ="">请选择</option>
+                                <option v-for="(item,index) in this[this.type+'Type']" :key="index" 
+                                :value ="item.type">{{item.name}}</option>
+                                
+                        </select>
                     </li>
                     <li>
                         <span>{{tit}}起始时间</span>
@@ -80,7 +83,7 @@
           </div>
           <div class="file">
               <h2>上传附件</h2>
-             <input class="file" type="file" multiple>
+             <input class="file" type="file" value="arr"  @change="file"  multiple>
           </div>
         </div>
         <footer class="footers">
@@ -105,8 +108,33 @@ export default {
            value1:"",
            value2:"",
             value3:"",
+            value:"",
             text:"",
-            type:"overtime"
+            types:"",
+            type:"overtime",
+            arr:"",
+            num:5,
+            overtimeType:[
+                {
+                    type:1,
+                    name:"节假日加班"
+                }, {
+                    type:2,
+                    name:"周末加班"
+                }, {
+                    type:3,
+                    name:"没做完加班"
+                }
+            ],
+             vacationType:[
+                {
+                    type:1,
+                    name:"节假日休班"
+                }, {
+                    type:2,
+                    name:"周末休假"
+                }
+            ]
         }
     },
     components:{
@@ -144,19 +172,30 @@ export default {
                 }
             });
          },
+         file:function(){
+                console.log(this.arr)
+         },
+         select:function(e){
+            this.value=e.target.value
+           
+         },
          sure(){
-            var d = this.value2
+          if(this.value1=="" || this.value2=="" || this.value3==""){
+              alert("信息不完整")
+          }else{
+                var d = this.value2
                 const youWant= d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + 
                 d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds()
             var d=this.value3    
                 const endtime= d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + 
                 d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds()
-              
+                console.log(this.value)
+                
             request.post("/api/apply/"+this.type,{
                startTime:youWant,
                endTime:endtime,
                describe:this.text,
-               type:"加班",
+               type:this.value,
                annex:[]
             }).then(res=>{
                 if(res.code===1){
@@ -169,6 +208,7 @@ export default {
                     })
                 }
             })
+          }
          }
         
 
