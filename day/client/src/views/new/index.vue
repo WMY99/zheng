@@ -83,7 +83,7 @@
           </div>
           <div class="file">
               <h2>上传附件</h2>
-             <input class="file" type="file" value="arr"  @change="file"  multiple>
+             <input class="file" type="file" value="arr"  @change="pubImg"  multiple>
           </div>
         </div>
         <footer class="footers">
@@ -113,6 +113,7 @@ export default {
             types:"",
             type:"overtime",
             arr:"",
+            annex:[],
             num:5,
             overtimeType:[
                 {
@@ -172,9 +173,15 @@ export default {
                 }
             });
          },
-         file:function(){
-                console.log(this.arr)
-         },
+         pubImg(e){
+            // console.log(e.target.files[0])
+            let file=e.target.files[0]
+            let reader = new FormData();
+            reader.append("file",file) 
+             request.post("/api/upload",reader).then(res=>{
+                this.annex.push(res.url)
+            })
+        },
          select:function(e){
             this.value=e.target.value
            
@@ -196,7 +203,7 @@ export default {
                endTime:endtime,
                describe:this.text,
                type:this.value,
-               annex:[]
+               annex:this.annex
             }).then(res=>{
                 if(res.code===1){
                     this.$router.push({
